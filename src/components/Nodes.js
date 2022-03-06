@@ -1,4 +1,4 @@
-export default function Nodes({ $app, initialState, onClick }) {
+export default function Nodes({ $app, initialState, onClick, onBackClick }) {
   this.state = initialState;
   this.$target = document.createElement("ul");
   $app.appendChild(this.$target);
@@ -10,6 +10,7 @@ export default function Nodes({ $app, initialState, onClick }) {
   };
 
   this.onClick = onClick;
+  this.onBackClick = onBackClick;
 
   this.render = () => {
     if (this.state.nodes) {
@@ -19,7 +20,6 @@ export default function Nodes({ $app, initialState, onClick }) {
             node.type === "FILE"
               ? "../../assets/file.png"
               : "../../assets/directory.png";
-          console.log(node);
           return `
                     <div class="Node" data-node-id="${node.id}">
                         <img src="${iconPath}" />
@@ -35,13 +35,18 @@ export default function Nodes({ $app, initialState, onClick }) {
     this.$target.querySelectorAll(".Node").forEach(($node) => {
       $node.addEventListener("click", (e) => {
         //e.target.dataset으로 위에서 data-로 시작하는 props에 접근할 수 있음
-        const { nodeId } = e.target.closest("[data-node-id]").dataset;
-        const selectedNode = this.state.nodes.find(
-          (node) => node.id === nodeId
-        );
+        const element = e.target.closest("[data-node-id]");
 
-        if (selectedNode) {
-          this.onClick(selectedNode);
+        if (!element) {
+          this.onBackClick();
+        } else {
+          const { nodeId } = element.dataset;
+          const selectedNode = this.state.nodes.find(
+            (node) => node.id === nodeId
+          );
+          if (selectedNode) {
+            this.onClick(selectedNode);
+          }
         }
       });
     });

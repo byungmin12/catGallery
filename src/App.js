@@ -36,6 +36,7 @@ export default function App($app) {
             ...this.state,
             depth: [...this.state.depth, node],
             nodes: nextNodes,
+            isRoot: false,
           });
         } else if (node.type === "FILE") {
           //FILE
@@ -45,13 +46,41 @@ export default function App($app) {
           });
         }
       } catch (err) {
-        // throw new Error(err);
+        throw new Error(err);
+      }
+    },
+    onBackClick: async () => {
+      try {
+        const nextState = { ...this.state };
+        nextState.depth.pop();
+
+        const prevNodeId =
+          nextState.depth.length === 0
+            ? null
+            : nextState.depth[nextState.depth.length - 1].id;
+
+        if (prevNodeId === null) {
+          const rootNodes = await request();
+          this.setState({
+            ...nextState,
+            isRoot: true,
+            nodes: rootNodes,
+          });
+        } else {
+          const prevNodes = await request(prevNodeId);
+          this.setState({
+            ...nextState,
+            isRoot: false,
+            nodes: prevNodes,
+          });
+        }
+      } catch (err) {
+        throw new Error(err);
       }
     },
   });
 
   this.setState = (nextState) => {
-    console.log(nextState);
     this.state = nextState;
     breadCrumb.setState(this.state.depth);
     nodes.setState({

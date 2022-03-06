@@ -15,7 +15,7 @@ export default function BreadCrumb({ $app, initialState }) {
         ${this.state
           .map(
             (node, idx) =>
-              `<div class="nav-item data-index="${index}">${node.name}</div>`
+              `<div class="nav-item data-index="${idx}">${node.name}</div>`
           )
           .join("")}
         `;
